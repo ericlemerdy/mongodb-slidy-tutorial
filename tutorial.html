@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"> 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Valtech Cours du Soir, Eric Le Merdy" />
+  <meta name="date" content="Feb 28, 2012" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print" 
+    href="http://www.w3.org/Talks/Tools/Slidy/slidy.css" /> 
+  <script src="http://www.w3.org/Talks/Tools/Slidy/slidy.js.gz"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide cover title">
+  <h1 class="title">MongoDB</h1>
+  <p class="author">
+Valtech Cours du Soir, Eric Le Merdy
+  </p>
+  <p class="date">Feb 28, 2012</p> 
+</div>
+<div class="slide">
+
+<ul class="incremental">
+<li><p>Key messages:</p>
+<ul class="incremental">
+<li><p>MongoDB startup for developpers is easy</p></li>
+<li><p>Collection of documents != Relational tables</p>
+<ul class="incremental">
+<li>Database design and Indexes</li>
+</ul></li>
+<li><p>Learn MongoDB query language is valuable and nothing more than Javascript</p></li>
+<li><p>Java Driver basic usage</p></li>
+<li><p>Replication is easy and powerful</p></li>
+<li><p>Map/Reduce is possible</p></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Install the database</h1>
+<ul class="incremental">
+<li><p>Visit the <a href="http://www.mongodb.org/downloads">Download page</a></p></li>
+<li><p>Install the &quot;Production Release&quot;</p>
+<ul class="incremental">
+<li>used 2.0.2 for this tutorial</li>
+</ul></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Run the database</h1>
+<ul class="incremental">
+<li><p>MongoDB is essentially a database daemon :</p>
+<pre><code>cd mongodb-linux-i686-2.0.2/bin
+./mongod
+</code></pre></li>
+<li><p>Expected output:</p>
+<pre><code>ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$ ./mongod
+./mongod --help for help and startup options
+Mon Feb  6 22:35:59
+Mon Feb  6 22:35:59 warning: 32-bit servers don't have journaling enabled by default. Please use --journal if you want durability.
+Mon Feb  6 22:35:59 
+Mon Feb  6 22:35:59 [initandlisten] MongoDB starting : pid=19742 port=27017 dbpath=/data/db/ 32-bit host=harukiya
+...
+Mon Feb  6 22:35:59 [initandlisten] db version v2.0.2, pdfile version 4.5
+...
+Mon Feb  6 22:35:59 [initandlisten] exception in initAndListen: 10296 dbpath (/data/db/) does not exist, terminating
+...
+Mon Feb  6 22:35:59 dbexit: really exiting now
+ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Why it shutdown ?</h1>
+<ul class="incremental">
+<li><p>In the logs:</p>
+<pre><code>dbpath (/data/db/) does not exist, terminating
+</code></pre></li>
+<li><p>MongoDB expects a place on disk to store the database !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Run the database on a specified path</h1>
+<ul class="incremental">
+<li><p>Either</p>
+<ul class="incremental">
+<li><p>Create the '/data/db' default directory</p></li>
+<li><p>Or use the <code>dbpath</code> parameter:</p>
+<pre><code>./mongod --help | grep &quot;\-\-dbpath&quot;
+  --dbpath arg                directory for datafiles
+</code></pre></li>
+</ul></li>
+<li><p>Create a space and restart mongo on this space</p>
+<pre><code>mkdir ~/mongodatadb
+./mongod --dbpath ~/mongodatadb
+</code></pre></li>
+<li><p>The mongod should now run successfully:</p>
+<pre><code>...
+Mon Feb  6 23:58:04 [initandlisten] options: { dbpath: &quot;~/mongodatadb&quot; }
+Mon Feb  6 23:58:04 [websvr] admin web console waiting for connections on port 28017
+Mon Feb  6 23:58:04 [initandlisten] waiting for connections on port 27017
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>The Admin Web Console ?</h1>
+<ul class="incremental">
+<li><p><a href="http://localhost:28017">http://localhost:28017</a></p>
+<div class="figure">
+<img src="01_admin-web-console.png" alt="the admin web console screenshot" /><p class="caption">the admin web console screenshot</p>
+</div></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Does it work out-of-the-box ?</h1>
+<ul class="incremental">
+<li><p>Click on <a href="http://localhost:28017/listDatabases?text=1">listDatabases</a></p>
+<pre><code>REST is not enabled.  use --rest to turn on.
+check that port 28017 is secured for the network too.
+</code></pre></li>
+<li><p>Damn !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Activate rest</h1>
+<ul class="incremental">
+<li><p>Shutdown mongod</p></li>
+<li><p>Restart with <code>--rest</code> option:</p>
+<pre><code>./mongod --dbpath ../../mongodatadb --rest
+</code></pre></li>
+<li><p>Option has been passed:</p>
+<pre><code>Tue Feb  7 00:36:02 [initandlisten] options: { dbpath: &quot;../../mongodatadb&quot;, rest: true }
+</code></pre></li>
+<li><p>The <a href="http://localhost:28017/listDatabases?text=1">listDatabases</a> should now present an empty json list:</p>
+<pre><code>{ &quot;databases&quot; : [ 
+    { &quot;name&quot; : &quot;local&quot;,
+      &quot;sizeOnDisk&quot; : 1,
+      &quot;empty&quot; : true } ],
+  &quot;totalSize&quot; : 0 }
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Why JSON ?</h1>
+<pre><code>    { &quot;whyJSON&quot; :
+        { &quot;because&quot; :
+            { &quot;JSON&quot; : &quot;rocks&quot; } }
+    }
+</code></pre>
+<ul class="incremental">
+<li><p>MongoDB Admin Web Console uses the rest extension to easily display the results of commands</p></li>
+<li><p>BSON is the binary encoded version of JSON</p></li>
+<li><p>BSON is first class citizen in MongoDB</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>It is time to open a MongoDB shell !</h1>
+<ul class="incremental">
+<li><p>Practice first, how to start a mongo client:</p>
+<pre><code>./mongo
+</code></pre></li>
+<li><p>You should get a brand new shell</p>
+<pre><code>MongoDB shell version: 2.0.2
+connecting to: test
+&gt; 
+</code></pre></li>
+<li><p>This has worked because</p>
+<ul class="incremental">
+<li><p>You started 'mongod' on the default <em>27017</em> port</p></li>
+<li><p>'mongo' connects on a database named 'test' by default</p></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Help</h1>
+<pre><code>&gt; help
+</code></pre>
+<ul class="incremental">
+<li><p>Returns</p>
+<pre><code>db.help()                    help on db methods
+db.mycoll.help()             help on collection methods
+rs.help()                    help on replica set methods
+help admin                   administrative help
+help connect                 connecting to a db help
+help keys                    key shortcuts
+help misc                    misc things to know
+help mr                      mapreduce
+
+show dbs                     show database names
+show collections             show collections in current database
+show users                   show users in current database
+show profile                 show most recent system.profile entries with time &gt;= 1ms
+show logs                    show the accessible logger names
+show log [name]              prints out the last segment of log in memory, 'global' is default
+use &lt;db_name&gt;                set current database
+db.foo.find()                list objects in collection foo
+db.foo.find( { a : 1 } )     list objects in foo where a == 1
+it                           result of the last line evaluated; use to further iterate
+DBQuery.shellBatchSize = x   set default number of items to display on shell
+exit                         quit the mongo shell
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Data breakdown structure</h1>
+<ul class="incremental">
+<li><p>Document &lt; Collection &lt; Database &lt; Runtime</p></li>
+<li><p>Document : JSON fragment</p>
+<p>ex:</p>
+<pre><code>{ &quot;mongo&quot; : 
+  { &quot;features&quot; : [fail-over, replication, sharding, geolocation] }
+}
+</code></pre></li>
+<li><p>Collection : several Documents</p>
+<pre><code>&gt; show collections
+</code></pre></li>
+<li><p>Database : several Collections</p>
+<pre><code>&gt; show dbs
+local   (empty)
+</code></pre></li>
+<li><p>Runtime (daemon) : several Databases (physically stored in the dbpath)</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Are you empty ?</h1>
+<ul class="incremental">
+<li><p>Connect to a database</p>
+<pre><code>&gt; use test
+switched to db test
+</code></pre></li>
+<li><p>Find the collections of the database</p>
+<pre><code>&gt; db.test.getCollectionNames()
+[ ]
+</code></pre></li>
+<li><p>The collection is empty !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Insert a doc... Wait a minute...</h1>
+<ul class="incremental">
+<li><p>First achievement :</p>
+<p>MongoDB startup for developpers is easy.</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Overview of a document</h1>
+<ul class="incremental">
+<li><p>A JSON document :</p>
+<pre><code>clipart = {
+  &quot;title&quot; : &quot;Code Story logo&quot;,
+  &quot;uploader&quot; : {
+    &quot;name&quot; : &quot;ericlemerdy&quot;,
+    &quot;href&quot; : &quot;http://openclipart.org/user-detail/ericlemerdy&quot;
+  },
+  &quot;drawn by&quot; : &quot;ericlemerdy&quot;,
+  &quot;created&quot; : ISODate(&quot;2012-02-08T02:05:15.401Z&quot;),
+  &quot;description&quot; : &quot;My contribution for the www.codestory.net logo.&quot;,
+  &quot;tags&quot; : [ &quot;developpers&quot;, &quot;code&quot;, &quot;computer&quot;, &quot;people&quot;, &quot;logo&quot;, &quot;public domain&quot; ],
+  &quot;viewed by&quot; : 236,
+  &quot;image&quot; : {
+    &quot;image/svg+xml&quot; : &quot;http://openclipart.org/people/ericlemerdy/Code_Story_Logo.svg&quot;,
+    &quot;image/png&quot; : &quot;http://openclipart.org/image/800px/svg_to_png/166309/Code_Story_Logo.png&quot;
+  }
+}
+</code></pre></li>
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+% MongoDB
+% Valtech *Cours du Soir*, Eric Le Merdy
+% Feb 28, 2012
+
+  - Key messages:
+
+      - MongoDB startup for developpers is easy
+
+      - Collection of documents != Relational tables
+
+          - Database design and Indexes
+
+      - Learn MongoDB query language is valuable and nothing more than Javascript
+
+      - Java Driver basic usage
+
+      - Replication is easy and powerful
+
+      - Map/Reduce is possible
+
+Install the database
+====================
+
+  - Visit the [Download page](http://www.mongodb.org/downloads)
+
+  - Install the "Production Release"
+
+      - used 2.0.2 for this tutorial
+
+Run the database
+================
+
+  - MongoDB is essentially a database daemon :
+
+        cd mongodb-linux-i686-2.0.2/bin
+        ./mongod
+
+  - Expected output:
+
+        ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$ ./mongod
+        ./mongod --help for help and startup options
+        Mon Feb  6 22:35:59
+        Mon Feb  6 22:35:59 warning: 32-bit servers don't have journaling enabled by default. Please use --journal if you want durability.
+        Mon Feb  6 22:35:59 
+        Mon Feb  6 22:35:59 [initandlisten] MongoDB starting : pid=19742 port=27017 dbpath=/data/db/ 32-bit host=harukiya
+        ...
+        Mon Feb  6 22:35:59 [initandlisten] db version v2.0.2, pdfile version 4.5
+        ...
+        Mon Feb  6 22:35:59 [initandlisten] exception in initAndListen: 10296 dbpath (/data/db/) does not exist, terminating
+        ...
+        Mon Feb  6 22:35:59 dbexit: really exiting now
+        ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$
+
+Why it shutdown ?
+=================
+
+  - In the logs:
+
+        dbpath (/data/db/) does not exist, terminating
+
+  - MongoDB expects a place on disk to store the database !
+
+Run the database on a specified path
+====================================
+
+  - Either
+
+      - Create the '/data/db' default directory
+
+      - Or use the `dbpath` parameter:
+
+            ./mongod --help | grep "\-\-dbpath"
+              --dbpath arg                directory for datafiles
+
+  - Create a space and restart mongo on this space
+
+        mkdir ~/mongodatadb
+        ./mongod --dbpath ~/mongodatadb
+
+  - The mongod should now run successfully:
+
+        ...
+        Mon Feb  6 23:58:04 [initandlisten] options: { dbpath: "~/mongodatadb" }
+        Mon Feb  6 23:58:04 [websvr] admin web console waiting for connections on port 28017
+        Mon Feb  6 23:58:04 [initandlisten] waiting for connections on port 27017
+
+The Admin Web Console ?
+=======================
+
+  - [http://localhost:28017](http://localhost:28017)
+
+    ![the admin web console screenshot](01_admin-web-console.png)
+
+Does it work out-of-the-box ?
+=============================
+
+  - Click on [listDatabases](http://localhost:28017/listDatabases?text=1)
+
+        REST is not enabled.  use --rest to turn on.
+        check that port 28017 is secured for the network too.
+
+  - Damn !
+
+Activate rest
+=============
+
+  - Shutdown mongod
+
+  - Restart with `--rest` option:
+
+        ./mongod --dbpath ../../mongodatadb --rest
+
+  - Option has been passed:
+
+        Tue Feb  7 00:36:02 [initandlisten] options: { dbpath: "../../mongodatadb", rest: true }
+
+  - The [listDatabases](http://localhost:28017/listDatabases?text=1) should now present an empty json list:
+
+        { "databases" : [ 
+            { "name" : "local",
+              "sizeOnDisk" : 1,
+              "empty" : true } ],
+          "totalSize" : 0 }
+
+Why JSON ?
+==========
+
+        { "whyJSON" :
+            { "because" :
+                { "JSON" : "rocks" } }
+        }
+
+  - MongoDB Admin Web Console uses the rest extension to easily display the results of commands
+
+  - BSON is the binary encoded version of JSON
+
+  - BSON is first class citizen in MongoDB
+
+It is time to open a MongoDB shell !
+====================================
+
+  - Practice first, how to start a mongo client:
+
+        ./mongo
+
+  - You should get a brand new shell
+
+        MongoDB shell version: 2.0.2
+        connecting to: test
+        > 
+
+  - This has worked because
+
+      - You started 'mongod' on the default *27017* port
+
+      - 'mongo' connects on a database named 'test' by default
+
+Help
+====
+
+    > help
+
+  - Returns
+
+        db.help()                    help on db methods
+        db.mycoll.help()             help on collection methods
+        rs.help()                    help on replica set methods
+        help admin                   administrative help
+        help connect                 connecting to a db help
+        help keys                    key shortcuts
+        help misc                    misc things to know
+        help mr                      mapreduce
+
+        show dbs                     show database names
+        show collections             show collections in current database
+        show users                   show users in current database
+        show profile                 show most recent system.profile entries with time >= 1ms
+        show logs                    show the accessible logger names
+        show log [name]              prints out the last segment of log in memory, 'global' is default
+        use <db_name>                set current database
+        db.foo.find()                list objects in collection foo
+        db.foo.find( { a : 1 } )     list objects in foo where a == 1
+        it                           result of the last line evaluated; use to further iterate
+        DBQuery.shellBatchSize = x   set default number of items to display on shell
+        exit                         quit the mongo shell
+
+Data breakdown structure
+========================
+
+  - Document < Collection < Database < Runtime
+
+  - Document : JSON fragment
+
+    ex:
+
+        { "mongo" : 
+          { "features" : [fail-over, replication, sharding, geolocation] }
+        }
+
+  - Collection : several Documents
+
+        > show collections
+
+  - Database : several Collections
+
+        > show dbs
+        local	(empty)
+
+  - Runtime (daemon) : several Databases (physically stored in the dbpath)
+
+Are you empty ?
+===============
+
+  - Connect to a database
+
+        > use test
+        switched to db test
+
+  - Find the collections of the database
+
+        > db.test.getCollectionNames()
+        [ ]
+
+  - The collection is empty !
+
+Insert a doc... Wait a minute...
+================================
+
+  - First achievement :
+
+    MongoDB startup for developpers is easy.
+
+Overview of a document
+======================
+
+  - A JSON document :
+
+        clipart = {
+          "title" : "Code Story logo",
+          "uploader" : {
+            "name" : "ericlemerdy",
+            "href" : "http://openclipart.org/user-detail/ericlemerdy"
+          },
+          "drawn by" : "ericlemerdy",
+          "created" : ISODate("2012-02-08T02:05:15.401Z"),
+          "description" : "My contribution for the www.codestory.net logo.",
+          "tags" : [ "developpers", "code", "computer", "people", "logo", "public domain" ],
+          "viewed by" : 236,
+          "image" : {
+            "image/svg+xml" : "http://openclipart.org/people/ericlemerdy/Code_Story_Logo.svg",
+            "image/png" : "http://openclipart.org/image/800px/svg_to_png/166309/Code_Story_Logo.png"
+          }
+        }
+
