@@ -218,7 +218,7 @@ Are you empty ?
 
   - Find the collections of the database
 
-        > db.test.getCollectionNames()
+        > db.getCollectionNames()
         [ ]
 
   - The collection is empty !
@@ -235,7 +235,7 @@ Overview of a document
 
   - A JSON document :
 
-        clipart = {
+        > clipart = {
           "title" : "Code Story logo",
           "uploader" : {
             "name" : "ericlemerdy",
@@ -252,3 +252,38 @@ Overview of a document
           }
         }
 
+Create a collection
+===================
+
+  - Let's create the 'cliparts' collection.
+
+  - There is nothing to do as long you do not insert to a first document in it :
+
+        > db.cliparts.findOne()
+        null
+
+  - Does a read has created the collection ?
+
+        > db.getCollectionNames()
+        [ ]
+
+    Obviously no
+
+Insert the document in the collection
+=====================================
+
+    > db.cliparts.save(clipart)
+
+  - Does a write has created the collection ?
+
+        > db.getCollectionNames()
+        [ "cliparts", "system.indexes" ]
+
+    Obviously yes
+
+    Even 2 collections !
+      - cliparts : the collection that contains our new document
+      - system.indexes : the index to allow mongo to be fast searching
+
+Digging in indexes
+==================

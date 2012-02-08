@@ -254,7 +254,7 @@ local   (empty)
 switched to db test
 </code></pre></li>
 <li><p>Find the collections of the database</p>
-<pre><code>&gt; db.test.getCollectionNames()
+<pre><code>&gt; db.getCollectionNames()
 [ ]
 </code></pre></li>
 <li><p>The collection is empty !</p></li>
@@ -275,7 +275,7 @@ switched to db test
 <h1>Overview of a document</h1>
 <ul class="incremental">
 <li><p>A JSON document :</p>
-<pre><code>clipart = {
+<pre><code>&gt; clipart = {
   &quot;title&quot; : &quot;Code Story logo&quot;,
   &quot;uploader&quot; : {
     &quot;name&quot; : &quot;ericlemerdy&quot;,
@@ -293,6 +293,47 @@ switched to db test
 }
 </code></pre></li>
 </ul>
+</div>
+
+<div class="slide">
+
+<h1>Create a collection</h1>
+<ul class="incremental">
+<li><p>Let's create the 'cliparts' collection.</p></li>
+<li><p>There is nothing to do as long you do not insert to a first document in it :</p>
+<pre><code>&gt; db.cliparts.findOne()
+null
+</code></pre></li>
+<li><p>Does a read has created the collection ?</p>
+<pre><code>&gt; db.getCollectionNames()
+[ ]
+</code></pre>
+<p>Obviously no</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Insert the document in the collection</h1>
+<pre><code>&gt; db.cliparts.save(clipart)
+</code></pre>
+<ul class="incremental">
+<li><p>Does a write has created the collection ?</p>
+<pre><code>&gt; db.getCollectionNames()
+[ &quot;cliparts&quot;, &quot;system.indexes&quot; ]
+</code></pre>
+<p>Obviously yes</p>
+Even 2 collections !
+<ul class="incremental">
+<li>cliparts : the collection that contains our new document</li>
+<li>system.indexes : the index to allow mongo to be fast searching</li>
+</ul></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Digging in indexes</h1>
 </div>
 </body>
 </html>
