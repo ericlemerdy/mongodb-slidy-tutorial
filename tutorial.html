@@ -22,29 +22,33 @@ Valtech Cours du Soir, Eric Le Merdy
 </div>
 <div class="slide">
 
-<ul class="incremental">
-<li><p>Key messages:</p>
-<ul class="incremental">
-<li><p>MongoDB startup for developpers is easy</p></li>
+<h1>What's the plan ?</h1>
+<ol>
+<li><p>MongoDB startup for developpers</p></li>
 <li><p>Collection of documents != Relational tables</p>
-<ul class="incremental">
+<ul>
 <li>Database design and Indexes</li>
 </ul></li>
-<li><p>Learn MongoDB query language is valuable and nothing more than Javascript</p></li>
+<li><p>Learn MongoDB query language</p></li>
 <li><p>Java Driver basic usage</p></li>
-<li><p>Replication is easy and powerful</p></li>
-<li><p>Map/Reduce is possible</p></li>
-</ul></li>
-</ul>
+<li><p>Replication</p></li>
+<li><p>Map/Reduce</p></li>
+</ol>
+</div>
+
+<div class="slide">
+
+<h1>MongoDB startup</h1>
+<p><em>Have you ever installed Oracle ?</em></p>
 </div>
 
 <div class="slide">
 
 <h1>Install the database</h1>
-<ul class="incremental">
+<ul>
 <li><p>Visit the <a href="http://www.mongodb.org/downloads">Download page</a></p></li>
 <li><p>Install the &quot;Production Release&quot;</p>
-<ul class="incremental">
+<ul>
 <li>used 2.0.2 for this tutorial</li>
 </ul></li>
 </ul>
@@ -53,7 +57,7 @@ Valtech Cours du Soir, Eric Le Merdy
 <div class="slide">
 
 <h1>Run the database</h1>
-<ul class="incremental">
+<ul>
 <li><p>MongoDB is essentially a database daemon :</p>
 <pre><code>cd mongodb-linux-i686-2.0.2/bin
 ./mongod
@@ -79,7 +83,7 @@ ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$
 <div class="slide">
 
 <h1>Why it shutdown ?</h1>
-<ul class="incremental">
+<ul>
 <li><p>In the logs:</p>
 <pre><code>dbpath (/data/db/) does not exist, terminating
 </code></pre></li>
@@ -90,11 +94,11 @@ ericlemerdy@harukiya:~/mongodb-linux-i686-2.0.2/bin$
 <div class="slide">
 
 <h1>Run the database on a specified path</h1>
-<ul class="incremental">
+<ul>
 <li><p>Either</p>
-<ul class="incremental">
-<li><p>Create the '/data/db' default directory</p></li>
-<li><p>Or use the <code>dbpath</code> parameter:</p>
+<ul>
+<li><p>Create the <em>/data/db</em> default directory</p></li>
+<li><p>Or use the <em>dbpath</em> parameter:</p>
 <pre><code>./mongod --help | grep &quot;\-\-dbpath&quot;
   --dbpath arg                directory for datafiles
 </code></pre></li>
@@ -115,7 +119,7 @@ Mon Feb  6 23:58:04 [initandlisten] waiting for connections on port 27017
 <div class="slide">
 
 <h1>The Admin Web Console ?</h1>
-<ul class="incremental">
+<ul>
 <li><p><a href="http://localhost:28017">http://localhost:28017</a></p>
 <div class="figure">
 <img src="01_admin-web-console.png" alt="the admin web console screenshot" /><p class="caption">the admin web console screenshot</p>
@@ -126,7 +130,7 @@ Mon Feb  6 23:58:04 [initandlisten] waiting for connections on port 27017
 <div class="slide">
 
 <h1>Does it work out-of-the-box ?</h1>
-<ul class="incremental">
+<ul>
 <li><p>Click on <a href="http://localhost:28017/listDatabases?text=1">listDatabases</a></p>
 <pre><code>REST is not enabled.  use --rest to turn on.
 check that port 28017 is secured for the network too.
@@ -138,9 +142,9 @@ check that port 28017 is secured for the network too.
 <div class="slide">
 
 <h1>Activate rest</h1>
-<ul class="incremental">
+<ul>
 <li><p>Shutdown mongod</p></li>
-<li><p>Restart with <code>--rest</code> option:</p>
+<li><p>Restart with <em>--rest</em> option:</p>
 <pre><code>./mongod --dbpath ../../mongodatadb --rest
 </code></pre></li>
 <li><p>Option has been passed:</p>
@@ -164,17 +168,17 @@ check that port 28017 is secured for the network too.
             { &quot;JSON&quot; : &quot;rocks&quot; } }
     }
 </code></pre>
-<ul class="incremental">
+<ul>
 <li><p>MongoDB Admin Web Console uses the rest extension to easily display the results of commands</p></li>
 <li><p>BSON is the binary encoded version of JSON</p></li>
-<li><p>BSON is first class citizen in MongoDB</p></li>
+<li><p>JSON is first class citizen in MongoDB</p></li>
 </ul>
 </div>
 
 <div class="slide">
 
 <h1>It is time to open a MongoDB shell !</h1>
-<ul class="incremental">
+<ul>
 <li><p>Practice first, how to start a mongo client:</p>
 <pre><code>./mongo
 </code></pre></li>
@@ -184,9 +188,9 @@ connecting to: test
 &gt; 
 </code></pre></li>
 <li><p>This has worked because</p>
-<ul class="incremental">
-<li><p>You started 'mongod' on the default <em>27017</em> port</p></li>
-<li><p>'mongo' connects on a database named 'test' by default</p></li>
+<ul>
+<li><p>You started <em>mongod</em> on the default <em>27017</em> port</p></li>
+<li><p><em>mongo</em> connects on a database named <em>test</em> by default</p></li>
 </ul></li>
 </ul>
 </div>
@@ -196,7 +200,7 @@ connecting to: test
 <h1>Help</h1>
 <pre><code>&gt; help
 </code></pre>
-<ul class="incremental">
+<ul>
 <li><p>Returns</p>
 <pre><code>db.help()                    help on db methods
 db.mycoll.help()             help on collection methods
@@ -225,8 +229,17 @@ exit                         quit the mongo shell
 
 <div class="slide">
 
+<h1>First Achievement : MongoDB startup</h1>
+<ul>
+<li><p>First achievement :</p>
+<p><img src="02_badge-easy.jpeg" alt="MongoDB startup is easy" /> MongoDB startup for developpers is easy !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
 <h1>Data breakdown structure</h1>
-<ul class="incremental">
+<ul>
 <li><p>Document &lt; Collection &lt; Database &lt; Runtime</p></li>
 <li><p>Document : JSON fragment</p>
 <p>ex:</p>
@@ -247,33 +260,27 @@ local   (empty)
 
 <div class="slide">
 
-<h1>Are you empty ?</h1>
-<ul class="incremental">
-<li><p>Connect to a database</p>
-<pre><code>&gt; use test
-switched to db test
+<h1>JSON</h1>
+<ul>
+<li><p>Object</p>
+<pre><code>{ pairs }
 </code></pre></li>
-<li><p>Find the collections of the database</p>
-<pre><code>&gt; db.getCollectionNames()
-[ ]
+<li><p>Pair</p>
+<pre><code>string : Value
 </code></pre></li>
-<li><p>The collection is empty !</p></li>
+<li><p>Value</p>
+<pre><code>Array, primitive values
+</code></pre></li>
+<li><p>Array</p>
+<pre><code>[ Values ]
+</code></pre></li>
 </ul>
 </div>
 
 <div class="slide">
 
-<h1>Insert a doc... Wait a minute...</h1>
-<ul class="incremental">
-<li><p>First achievement :</p>
-<p>MongoDB startup for developpers is easy.</p></li>
-</ul>
-</div>
-
-<div class="slide">
-
-<h1>Overview of a document</h1>
-<ul class="incremental">
+<h1>Sample document</h1>
+<ul>
 <li><p>A JSON document :</p>
 <pre><code>&gt; clipart = {
   &quot;title&quot; : &quot;Code Story logo&quot;,
@@ -297,43 +304,61 @@ switched to db test
 
 <div class="slide">
 
-<h1>Create a collection</h1>
-<ul class="incremental">
-<li><p>Let's create the 'cliparts' collection.</p></li>
-<li><p>There is nothing to do as long you do not insert to a first document in it :</p>
-<pre><code>&gt; db.cliparts.findOne()
-null
-</code></pre></li>
-<li><p>Does a read has created the collection ?</p>
-<pre><code>&gt; db.getCollectionNames()
-[ ]
-</code></pre>
-<p>Obviously no</p></li>
+<h1>Relational schema</h1>
+<ul>
+<li><div class="figure">
+<img src="03_relational-schema.png" title="Relational schema" /><p class="caption"></p>
+</div>
+<p>http://yuml.me/diagram/scruffy/class/[Clipart|title : String;drawn-by : String;created : Date;description : String;tags : List<String>;viewed-by : Integer], [User|name : String;href : Url], [Image|svg : Url;png : Url],[Clipart]&lt;&gt;*-uploader 1&gt;[User], [Clipart]&lt;&gt;1-image 1&gt;[Image]</p></li>
 </ul>
 </div>
 
 <div class="slide">
 
-<h1>Insert the document in the collection</h1>
-<pre><code>&gt; db.cliparts.save(clipart)
-</code></pre>
-<ul class="incremental">
-<li><p>Does a write has created the collection ?</p>
-<pre><code>&gt; db.getCollectionNames()
-[ &quot;cliparts&quot;, &quot;system.indexes&quot; ]
-</code></pre>
-<p>Obviously yes</p>
-Even 2 collections !
-<ul class="incremental">
-<li>cliparts : the collection that contains our new document</li>
-<li>system.indexes : the index to allow mongo to be fast searching</li>
-</ul></li>
+<h1>I ♥ SQL</h1>
+<ul>
+<li><p>MongoDB is <strong>NOT</strong> a relational database</p></li>
+<li><p>Forget what you learn about normalisation</p>
+<p>This just not apply to what mongodb can do</p></li>
+<li><p>In relational model, there is a promise : &quot;You can decouple schema design from applicative work (thanks to normalization)&quot;</p>
+<p>That's why we get RDBMs specialists after all...</p></li>
+<li><p>In MongoDB, you have to design your documents <strong>for the job</strong> that your application must do.</p></li>
 </ul>
 </div>
 
 <div class="slide">
 
-<h1>Digging in indexes</h1>
+<h1>Document based schema design principles</h1>
+<ul>
+<li><p>Transaction is only <strong>document-based</strong></p></li>
+<li><p>Storage is cheap</p></li>
+<li><p><strong>Do not</strong> perform runtime relations</p>
+<p><strong>Duplicate</strong> !</p>
+<p>E.g. : Clipart -&gt; User</p></li>
+<li><p>Think of consequences in your application :</p>
+<p>When a user change its display name...</p></li>
+<li><p>Does not apply to all domains where A(tomicity), C(onsistency), I(solation), D(urability) is appreciated through the entire schema.</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Schema free ?</h1>
+<ul>
+<li><p>A single collection can store different &quot;types&quot; of documents</p></li>
+<li><p>Manage the schema evolution by your application</p>
+<p>Evolving data structure when accessing the document for exemple</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Achievement 2 : Document schema design principles</h1>
+<ul>
+<li><p>Second achievement :</p>
+<p><img src="04_badge-nosql.jpeg" alt="NoSQL document database != relationnal" /> Document oriented schema design is different from relational !</p></li>
+<li><p>More informations : <a href="http://www.10gen.com/presentations/mongosv-2011/schema-design-principles-and-practice">10gen - MongoDB Presentations - Schema Design Principles and Practice</a></p></li>
+</ul>
 </div>
 </body>
 </html>

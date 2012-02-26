@@ -2,21 +2,27 @@
 % Valtech *Cours du Soir*, Eric Le Merdy
 % Feb 28, 2012
 
-  - Key messages:
+What's the plan ?
+=================
 
-      - MongoDB startup for developpers is easy
+  #. MongoDB startup for developpers
 
-      - Collection of documents != Relational tables
+  #. Collection of documents != Relational tables
 
-          - Database design and Indexes
+      + Database design and Indexes
 
-      - Learn MongoDB query language is valuable and nothing more than Javascript
+  #. Learn MongoDB query language
 
-      - Java Driver basic usage
+  #. Java Driver basic usage
 
-      - Replication is easy and powerful
+  #. Replication
 
-      - Map/Reduce is possible
+  #. Map/Reduce
+
+MongoDB startup
+===============
+
+_Have you ever installed Oracle ?_
 
 Install the database
 ====================
@@ -65,9 +71,9 @@ Run the database on a specified path
 
   - Either
 
-      - Create the '/data/db' default directory
+      - Create the _/data/db_ default directory
 
-      - Or use the `dbpath` parameter:
+      - Or use the _dbpath_ parameter:
 
             ./mongod --help | grep "\-\-dbpath"
               --dbpath arg                directory for datafiles
@@ -106,7 +112,7 @@ Activate rest
 
   - Shutdown mongod
 
-  - Restart with `--rest` option:
+  - Restart with _--rest_ option:
 
         ./mongod --dbpath ../../mongodatadb --rest
 
@@ -134,7 +140,7 @@ Why JSON ?
 
   - BSON is the binary encoded version of JSON
 
-  - BSON is first class citizen in MongoDB
+  - JSON is first class citizen in MongoDB
 
 It is time to open a MongoDB shell !
 ====================================
@@ -151,9 +157,9 @@ It is time to open a MongoDB shell !
 
   - This has worked because
 
-      - You started 'mongod' on the default *27017* port
+      - You started _mongod_ on the default _27017_ port
 
-      - 'mongo' connects on a database named 'test' by default
+      - _mongo_ connects on a database named _test_ by default
 
 Help
 ====
@@ -184,6 +190,13 @@ Help
         DBQuery.shellBatchSize = x   set default number of items to display on shell
         exit                         quit the mongo shell
 
+First Achievement : MongoDB startup
+===================================
+
+  - First achievement :
+
+    ![MongoDB startup is easy](02_badge-easy.jpeg) MongoDB startup for developpers is easy !
+
 Data breakdown structure
 ========================
 
@@ -208,30 +221,27 @@ Data breakdown structure
 
   - Runtime (daemon) : several Databases (physically stored in the dbpath)
 
-Are you empty ?
+JSON
+====
+
+  - Object
+
+        { pairs }
+
+  - Pair
+
+        string : Value
+
+  - Value
+
+        Array, primitive values
+
+  - Array
+
+        [ Values ]
+
+Sample document
 ===============
-
-  - Connect to a database
-
-        > use test
-        switched to db test
-
-  - Find the collections of the database
-
-        > db.getCollectionNames()
-        [ ]
-
-  - The collection is empty !
-
-Insert a doc... Wait a minute...
-================================
-
-  - First achievement :
-
-    MongoDB startup for developpers is easy.
-
-Overview of a document
-======================
 
   - A JSON document :
 
@@ -252,38 +262,63 @@ Overview of a document
           }
         }
 
-Create a collection
-===================
-
-  - Let's create the 'cliparts' collection.
-
-  - There is nothing to do as long you do not insert to a first document in it :
-
-        > db.cliparts.findOne()
-        null
-
-  - Does a read has created the collection ?
-
-        > db.getCollectionNames()
-        [ ]
-
-    Obviously no
-
-Insert the document in the collection
-=====================================
-
-    > db.cliparts.save(clipart)
-
-  - Does a write has created the collection ?
-
-        > db.getCollectionNames()
-        [ "cliparts", "system.indexes" ]
-
-    Obviously yes
-
-    Even 2 collections !
-      - cliparts : the collection that contains our new document
-      - system.indexes : the index to allow mongo to be fast searching
-
-Digging in indexes
+Relational  schema
 ==================
+
+  - ![](03_relational-schema.png "Relational schema")
+    
+    http://yuml.me/diagram/scruffy/class/[Clipart|title : String;drawn-by : String;created : Date;description : String;tags : List<String>;viewed-by : Integer], [User|name : String;href : Url], [Image|svg : Url;png : Url],[Clipart]<>*-uploader 1>[User], [Clipart]<>1-image 1>[Image]
+
+I ♥ SQL
+========
+
+  - MongoDB is __NOT__ a relational database
+
+  - Forget what you learn about normalisation
+
+    This just not apply to what mongodb can do
+
+
+  - In relational model, there is a promise : "You can decouple schema design from applicative work (thanks to normalization)"
+
+    That's why we get RDBMs specialists after all...
+
+  - In MongoDB, you have to design your documents __for the job__ that your application must do.
+
+Document based schema design principles
+=======================================
+
+  - Transaction is only __document-based__
+
+  - Storage is cheap
+
+  - __Do not__ perform runtime relations
+
+    __Duplicate__ !
+
+    E.g. : Clipart -> User
+
+  - Think of consequences in your application :
+
+    When a user change its display name...
+
+  - Does not apply to all domains where A(tomicity), C(onsistency), I(solation), D(urability) is appreciated through the entire schema.
+
+Schema free ?
+=============
+
+  - A single collection can store different "types" of documents
+
+  - Manage the schema evolution by your application
+
+    Evolving data structure when accessing the document for exemple
+
+
+Achievement 2 : Document schema design principles
+=================================================
+
+  - Second achievement :
+
+    ![NoSQL document database != relationnal](04_badge-nosql.jpeg) Document oriented schema design is different from relational !
+
+  - More informations : [10gen - MongoDB Presentations - Schema Design Principles and Practice](http://www.10gen.com/presentations/mongosv-2011/schema-design-principles-and-practice)
