@@ -5,7 +5,7 @@ public class Clipart {
     private String title;
     private Uploader uploader;
 
-    private Clipart() {
+    protected Clipart() {
     }
 
     public Clipart(String title, Uploader uploader) {
