@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mongodb.DB;
