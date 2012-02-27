@@ -5,7 +5,7 @@ public class Uploader {
     private String name;
     private String href;
 
-    private Uploader() {
+    protected Uploader() {
     }
 
     public Uploader(String name, String href) {
