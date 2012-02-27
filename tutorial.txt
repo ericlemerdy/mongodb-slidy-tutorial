@@ -2,8 +2,11 @@
 % Valtech *Cours du Soir*, Eric Le Merdy
 % Feb 28, 2012
 
+
 What's the plan ?
 =================
+
+![](00_mongodb-logo.png)
 
   #. MongoDB startup for developpers
 
@@ -732,6 +735,79 @@ Achievement 5 : MongoDB never fails
 
   - Fifth achievement :
 
-    ![MongoDB never fails](06_badge-fail-over.jpeg) MongoDB will never fail !
+    ![MongoDB never fails](07_badge-fail-over.jpeg) MongoDB will never fail !
 
   - Now, let's map reduce
+
+Map/Reduce
+==========
+
+  - [Source](http://www.slideshare.net/nateabele/building-apps-with-mongodb) from slide 25 to 29
+
+  - Define the map function:
+
+        > var map = function() {
+          this.tags.forEach(function(t) {
+            emit(t, { count : 1 } );
+          });
+        }
+
+Reduce
+======
+
+  - Define the reduce function:
+
+        > var reduce = function(key, value) {
+          var count = 0;
+          for (var i = 0, len = value.length; i < len; i++) {
+            count += value[i].count;
+          }
+          return { "count" : count };
+        }
+
+Get the result
+==============
+
+  - Get the result object
+
+        > var result = db.cliparts.mapReduce(map, reduce, { out : "mapreduceresult" });
+        > result
+        {
+          "result" : "mapreduceresult",
+          "timeMillis" : 188,
+          "counts" : {
+            "input" : 2,
+            "emit" : 6,
+            "reduce" : 3,
+            "output" : 3
+          },
+          "ok" : 1,
+        }
+
+  - Reading the output collection:
+
+        > db.mapreduceresult.find()
+        { "_id" : "LAPTOP", "value" : { "count" : 2 } }
+        { "_id" : "NOTEBOOK", "value" : { "count" : 2 } }
+        { "_id" : "PC", "value" : { "count" : 2 } }
+
+
+Achievement 6 : Map/Reduce
+==========================
+
+  - Six achievement :
+
+    ![MongoDB map reduce](08_badge-map-reduce.jpeg) MongoDB Map Reduce
+
+Thank you
+=========
+
+  - hu·mon·gous adj
+
+    : extremely large : huge <a humongous building> <humongous amounts of money> 
+
+    perhaps alteration of huge + monstrous
+
+    First Known Use: circa 1967
+
+    ![](02_badge-easy.jpeg) ![](04_badge-nosql.jpeg) ![](05_badge-shell.jpeg) ![](06_badge-java.jpeg) ![](07_badge-fail-over.jpeg) ![](08_badge-map-reduce.jpeg)

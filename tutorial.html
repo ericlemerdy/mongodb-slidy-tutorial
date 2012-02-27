@@ -23,6 +23,9 @@ Valtech Cours du Soir, Eric Le Merdy
 <div class="slide">
 
 <h1>What's the plan ?</h1>
+<div class="figure">
+<img src="00_mongodb-logo.png" /><p class="caption"></p>
+</div>
 <ol>
 <li><p>MongoDB startup for developpers</p></li>
 <li><p>Collection of documents != Relational tables</p>
@@ -678,7 +681,7 @@ true
 
 <h1>Achievement 3 : Master shell</h1>
 <ul>
-<li><p>Second achievement :</p>
+<li><p>Third achievement :</p>
 <p><img src="05_badge-shell.jpeg" alt="Be a shell master or the mastershell" /> Be a master shell !</p></li>
 <li><p>Let's move on to java !</p></li>
 </ul>
@@ -699,7 +702,7 @@ true
 
 <h1>Achievement 4 : Use mongoDB from java</h1>
 <ul>
-<li><p>Second achievement :</p>
+<li><p>Fourth achievement :</p>
 <p><img src="06_badge-java.jpeg" alt="Learn MongoDB in Java" /> You have learnt how to speak MongoDB in java !</p></li>
 <li><p>Now, let's replicate</p></li>
 </ul>
@@ -810,6 +813,96 @@ Mon Feb 27 03:21:55 reconnect 127.0.0.1 ok
 SECONDARY&gt;
 </code></pre></li>
 <li><p>If there are enough node (a majority), there is a vote and a new primary is elected. In this case, the PRIMARY has been step down to SECONDARY. And the SECONDARY has been step up to PRIMARY. There can still have writings on database.</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Achievement 5 : MongoDB never fails</h1>
+<ul>
+<li><p>Fifth achievement :</p>
+<p><img src="07_badge-fail-over.jpeg" alt="MongoDB never fails" /> MongoDB will never fail !</p></li>
+<li><p>Now, let's map reduce</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Map/Reduce</h1>
+<ul>
+<li><p><a href="http://www.slideshare.net/nateabele/building-apps-with-mongodb">Source</a> from slide 25 to 29</p></li>
+<li><p>Define the map function:</p>
+<pre><code>&gt; var map = function() {
+  this.tags.forEach(function(t) {
+    emit(t, { count : 1 } );
+  });
+}
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Reduce</h1>
+<ul>
+<li><p>Define the reduce function:</p>
+<pre><code>&gt; var reduce = function(key, value) {
+  var count = 0;
+  for (var i = 0, len = value.length; i &lt; len; i++) {
+    count += value[i].count;
+  }
+  return { &quot;count&quot; : count };
+}
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Get the result</h1>
+<ul>
+<li><p>Get the result object</p>
+<pre><code>&gt; var result = db.cliparts.mapReduce(map, reduce, { out : &quot;mapreduceresult&quot; });
+&gt; result
+{
+  &quot;result&quot; : &quot;mapreduceresult&quot;,
+  &quot;timeMillis&quot; : 188,
+  &quot;counts&quot; : {
+    &quot;input&quot; : 2,
+    &quot;emit&quot; : 6,
+    &quot;reduce&quot; : 3,
+    &quot;output&quot; : 3
+  },
+  &quot;ok&quot; : 1,
+}
+</code></pre></li>
+<li><p>Reading the output collection:</p>
+<pre><code>&gt; db.mapreduceresult.find()
+{ &quot;_id&quot; : &quot;LAPTOP&quot;, &quot;value&quot; : { &quot;count&quot; : 2 } }
+{ &quot;_id&quot; : &quot;NOTEBOOK&quot;, &quot;value&quot; : { &quot;count&quot; : 2 } }
+{ &quot;_id&quot; : &quot;PC&quot;, &quot;value&quot; : { &quot;count&quot; : 2 } }
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Achievement 6 : Map/Reduce</h1>
+<ul>
+<li><p>Six achievement :</p>
+<p><img src="08_badge-map-reduce.jpeg" alt="MongoDB map reduce" /> MongoDB Map Reduce</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Thank you</h1>
+<ul>
+<li><p>hu·mon·gous adj</p>
+<p>: extremely large : huge <a humongous building> <humongous amounts of money></p>
+<p>perhaps alteration of huge + monstrous</p>
+<p>First Known Use: circa 1967</p>
+<p><img src="02_badge-easy.jpeg" /> <img src="04_badge-nosql.jpeg" /> <img src="05_badge-shell.jpeg" /> <img src="06_badge-java.jpeg" /> <img src="07_badge-fail-over.jpeg" /> <img src="08_badge-map-reduce.jpeg" /></p></li>
 </ul>
 </div>
 </body>
