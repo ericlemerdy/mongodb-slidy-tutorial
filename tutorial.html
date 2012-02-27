@@ -38,6 +38,18 @@ Valtech Cours du Soir, Eric Le Merdy
 
 <div class="slide">
 
+<h1>Slides...</h1>
+<ul>
+<li><p>...are available in a github repository:</p>
+<pre><code>git clone https://ericlemerdy@github.com/ericlemerdy/mongodb-slidy-tutorial.git
+
+firefox mongodb-slidy-tutorial/tutorial.html
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
 <h1>MongoDB startup</h1>
 <p><em>Have you ever installed Oracle ?</em></p>
 </div>
@@ -669,6 +681,135 @@ true
 <li><p>Second achievement :</p>
 <p><img src="05_badge-shell.jpeg" alt="Be a shell master or the mastershell" /> Be a master shell !</p></li>
 <li><p>Let's move on to java !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Maven project</h1>
+<ul>
+<li><p>There is a maven project ready to import in your IDE:</p>
+<pre><code>mongodb-slidy-tutorial/mongodb-java-project/
+</code></pre></li>
+<li><p>Un-ignore all tests and make it green !</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Achievement 4 : Use mongoDB from java</h1>
+<ul>
+<li><p>Second achievement :</p>
+<p><img src="06_badge-java.jpeg" alt="Learn MongoDB in Java" /> You have learnt how to speak MongoDB in java !</p></li>
+<li><p>Now, let's replicate</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Why replicate a database ?</h1>
+<ul>
+<li><p><strong>Fail-over</strong> :</p>
+<p>if a node goes down the service is still up and running</p></li>
+<li><p><strong>Performance</strong> :</p>
+<p>if several nodes can serve the data, performance should increase</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Replication in MongoDB</h1>
+<ul>
+<li><p>Implemented with : Replica Set</p></li>
+<li><p>Out-of-the-box feature</p></li>
+<li><p>Let's build a replica set to understand</p></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>I will be your master</h1>
+<ol>
+<li><p>Restart mongo with a replicaset name</p>
+<pre><code>./mongod --dbpath ../../mongodatadb --rest --replSet valtech
+(...)
+Mon Feb 27 02:39:28 [rsStart] replSet can't get local.system.replset config from self or any seed (EMPTYCONFIG)
+Mon Feb 27 02:39:28 [rsStart] replSet info you may need to run replSetInitiate -- rs.initiate() in the shell -- if that is not already done
+</code></pre></li>
+<li><p>See the status : <a href="http://127.0.0.1:28017/_replSet">http://127.0.0.1:28017/_replSet</a></p></li>
+<li><p>Initiating the replica set :</p>
+<pre><code>&gt; rs.initiate()
+{
+  &quot;info2&quot; : &quot;no configuration explicitly specified -- making one&quot;,
+  &quot;me&quot; : &quot;harukiya:27017&quot;,
+  &quot;info&quot; : &quot;Config now saved locally.  Should come online in about a minute.&quot;,
+  &quot;ok&quot; : 1
+}
+</code></pre></li>
+</ol>
+</div>
+
+<div class="slide">
+
+<h1>And what is your IP address ?</h1>
+<ol>
+<li><p>Please join</p>
+<pre><code>PRIMARY&gt; rs.add(&quot;your_ip&quot;)
+{ &quot;ok&quot; : 1 }
+</code></pre>
+<p>On you logs:</p>
+<pre><code>Mon Feb 27 03:02:47 [rsHealthPoll] replSet member harukiya:27018 is now in state STARTUP2
+Mon Feb 27 03:02:49 [rsHealthPoll] replSet member harukiya:27018 is now in state RECOVERING
+(...)
+Mon Feb 27 03:03:04 [slaveTracking] build index local.slaves { _id: 1 }
+Mon Feb 27 03:03:04 [slaveTracking] build index done 0 records 0 secs
+(...)
+Mon Feb 27 03:03:07 [rsHealthPoll] replSet member harukiya:27018 is now in state SECONDARY
+</code></pre></li>
+<li><p>An arbiter or another node must join</p>
+<pre><code>PRIMARY&gt; rs.addArb(&quot;your_ip&quot;)
+{ “ok” : 1 }
+</code></pre></li>
+</ol>
+</div>
+
+<div class="slide">
+
+<h1>Connecting on a replica set</h1>
+<ul>
+<li><p>The configuration is known from the client side</p></li>
+<li><p>If you try to connect to a slave:</p>
+<pre><code>./mongo --host harukiya --port 27018
+SECONDARY&gt; use test
+switched to db test
+SECONDARY&gt; db.cliparts.findOne()
+Mon Feb 27 03:13:16 uncaught exception: error { &quot;$err&quot; : &quot;not master and slaveok=false&quot;, &quot;code&quot; : 13435 }
+</code></pre></li>
+<li><p>You can not execute queries unless you set slaveok=true :</p>
+<pre><code>SECONDARY&gt; rs.slaveOk()
+SECONDARY&gt; db.cliparts.findOne()
+{
+  &quot;_id&quot; : ObjectId(&quot;4f4a3ee88d08530d9516afbf&quot;),
+  (...)
+}
+</code></pre></li>
+</ul>
+</div>
+
+<div class="slide">
+
+<h1>Simulate a network failure</h1>
+<ul>
+<li><p>Shutdown master or 'stepDown'</p>
+<pre><code>PRIMARY&gt; rs.stepDown()
+Mon Feb 27 03:21:55 DBClientCursor::init call() failed
+Mon Feb 27 03:21:55 query failed : admin.$cmd { replSetStepDown: 60.0 } to: 127.0.0.1
+Mon Feb 27 03:21:55 Error: error doing query: failed shell/collection.js:151
+Mon Feb 27 03:21:55 trying reconnect to 127.0.0.1
+Mon Feb 27 03:21:55 reconnect 127.0.0.1 ok
+SECONDARY&gt;
+</code></pre></li>
+<li><p>If there are enough node (a majority), there is a vote and a new primary is elected. In this case, the PRIMARY has been step down to SECONDARY. And the SECONDARY has been step up to PRIMARY. There can still have writings on database.</p></li>
 </ul>
 </div>
 </body>
