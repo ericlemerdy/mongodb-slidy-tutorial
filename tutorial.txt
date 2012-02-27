@@ -2,8 +2,11 @@
 % Valtech *Cours du Soir*, Eric Le Merdy
 % Feb 28, 2012
 
+
 What's the plan ?
 =================
+
+![](00_mongodb-logo.png)
 
   #. MongoDB startup for developpers
 
@@ -18,6 +21,15 @@ What's the plan ?
   #. Replication
 
   #. Map/Reduce
+
+Slides...
+=========
+
+  - ...are available in a github repository:
+
+        git clone https://ericlemerdy@github.com/ericlemerdy/mongodb-slidy-tutorial.git
+
+        firefox mongodb-slidy-tutorial/tutorial.html
 
 MongoDB startup
 ===============
@@ -588,12 +600,214 @@ Create an index
         }
 
 Achievement 3 : Master shell
-=================================================
+============================
 
-  - Second achievement :
+  - Third achievement :
 
     ![Be a shell master or the mastershell](05_badge-shell.jpeg) Be a master shell !
 
   - Let's move on to java !
 
+Maven project
+=============
 
+  - There is a maven project ready to import in your IDE:
+
+        mongodb-slidy-tutorial/mongodb-java-project/
+
+  - Un-ignore all tests and make it green !
+
+Achievement 4 : Use mongoDB from java
+=====================================
+
+  - Fourth achievement :
+
+    ![Learn MongoDB in Java](06_badge-java.jpeg) You have learnt how to speak MongoDB in java !
+
+  - Now, let's replicate
+
+Why replicate a database ?
+==========================
+
+  - __Fail-over__ :
+
+    if a node goes down the service is still up and running
+
+  - __Performance__ :
+
+    if several nodes can serve the data, performance should increase
+
+Replication in MongoDB
+======================
+
+  - Implemented with : Replica Set
+
+  - Out-of-the-box feature
+
+  - Let's build a replica set to understand
+
+I will be your master
+=====================
+
+ #. Restart mongo with a replicaset name
+
+        ./mongod --dbpath ../../mongodatadb --rest --replSet valtech
+        (...)
+        Mon Feb 27 02:39:28 [rsStart] replSet can't get local.system.replset config from self or any seed (EMPTYCONFIG)
+        Mon Feb 27 02:39:28 [rsStart] replSet info you may need to run replSetInitiate -- rs.initiate() in the shell -- if that is not already done
+
+ #. See the status : [http://127.0.0.1:28017/_replSet](http://127.0.0.1:28017/_replSet)
+
+ #. Initiating the replica set :
+
+        > rs.initiate()
+        {
+          "info2" : "no configuration explicitly specified -- making one",
+          "me" : "harukiya:27017",
+          "info" : "Config now saved locally.  Should come online in about a minute.",
+          "ok" : 1
+        }
+
+And what is your IP address ?
+=============================
+
+ #. Please join
+
+        PRIMARY> rs.add("your_ip")
+        { "ok" : 1 }
+
+    On you logs:
+
+        Mon Feb 27 03:02:47 [rsHealthPoll] replSet member harukiya:27018 is now in state STARTUP2
+        Mon Feb 27 03:02:49 [rsHealthPoll] replSet member harukiya:27018 is now in state RECOVERING
+        (...)
+        Mon Feb 27 03:03:04 [slaveTracking] build index local.slaves { _id: 1 }
+        Mon Feb 27 03:03:04 [slaveTracking] build index done 0 records 0 secs
+        (...)
+        Mon Feb 27 03:03:07 [rsHealthPoll] replSet member harukiya:27018 is now in state SECONDARY
+
+ #. An arbiter or another node must join
+
+        PRIMARY> rs.addArb("your_ip")
+        { “ok” : 1 }
+
+Connecting on a replica set
+===========================
+
+  - The configuration is known from the client side
+
+  - If you try to connect to a slave:
+
+        ./mongo --host harukiya --port 27018
+        SECONDARY> use test
+        switched to db test
+        SECONDARY> db.cliparts.findOne()
+        Mon Feb 27 03:13:16 uncaught exception: error { "$err" : "not master and slaveok=false", "code" : 13435 }
+
+  - You can not execute queries unless you set slaveok=true :
+
+        SECONDARY> rs.slaveOk()
+        SECONDARY> db.cliparts.findOne()
+        {
+          "_id" : ObjectId("4f4a3ee88d08530d9516afbf"),
+          (...)
+        }
+
+Simulate a network failure
+==========================
+
+  - Shutdown master or 'stepDown'
+
+        PRIMARY> rs.stepDown()
+        Mon Feb 27 03:21:55 DBClientCursor::init call() failed
+        Mon Feb 27 03:21:55 query failed : admin.$cmd { replSetStepDown: 60.0 } to: 127.0.0.1
+        Mon Feb 27 03:21:55 Error: error doing query: failed shell/collection.js:151
+        Mon Feb 27 03:21:55 trying reconnect to 127.0.0.1
+        Mon Feb 27 03:21:55 reconnect 127.0.0.1 ok
+        SECONDARY>
+
+  - If there are enough node (a majority), there is a vote and a new primary is elected.
+    In this case, the PRIMARY has been step down to SECONDARY. And the SECONDARY has been step up to PRIMARY.
+    There can still have writings on database.
+
+Achievement 5 : MongoDB never fails
+===================================
+
+  - Fifth achievement :
+
+    ![MongoDB never fails](07_badge-fail-over.jpeg) MongoDB will never fail !
+
+  - Now, let's map reduce
+
+Map/Reduce
+==========
+
+  - [Source](http://www.slideshare.net/nateabele/building-apps-with-mongodb) from slide 25 to 29
+
+  - Define the map function:
+
+        > var map = function() {
+          this.tags.forEach(function(t) {
+            emit(t, { count : 1 } );
+          });
+        }
+
+Reduce
+======
+
+  - Define the reduce function:
+
+        > var reduce = function(key, value) {
+          var count = 0;
+          for (var i = 0, len = value.length; i < len; i++) {
+            count += value[i].count;
+          }
+          return { "count" : count };
+        }
+
+Get the result
+==============
+
+  - Get the result object
+
+        > var result = db.cliparts.mapReduce(map, reduce, { out : "mapreduceresult" });
+        > result
+        {
+          "result" : "mapreduceresult",
+          "timeMillis" : 188,
+          "counts" : {
+            "input" : 2,
+            "emit" : 6,
+            "reduce" : 3,
+            "output" : 3
+          },
+          "ok" : 1,
+        }
+
+  - Reading the output collection:
+
+        > db.mapreduceresult.find()
+        { "_id" : "LAPTOP", "value" : { "count" : 2 } }
+        { "_id" : "NOTEBOOK", "value" : { "count" : 2 } }
+        { "_id" : "PC", "value" : { "count" : 2 } }
+
+
+Achievement 6 : Map/Reduce
+==========================
+
+  - Six achievement :
+
+    ![MongoDB map reduce](08_badge-map-reduce.jpeg) MongoDB Map Reduce
+
+Thank you
+=========
+
+  - hu·mon·gous adj
+
+    : extremely large : huge <a humongous building> <humongous amounts of money> 
+
+    perhaps alteration of huge + monstrous
+
+    First Known Use: circa 1967
+
+    ![](02_badge-easy.jpeg) ![](04_badge-nosql.jpeg) ![](05_badge-shell.jpeg) ![](06_badge-java.jpeg) ![](07_badge-fail-over.jpeg) ![](08_badge-map-reduce.jpeg)
