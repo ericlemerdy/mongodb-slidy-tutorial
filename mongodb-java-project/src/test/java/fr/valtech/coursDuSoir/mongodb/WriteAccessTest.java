@@ -10,14 +10,12 @@ import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mongodb.DBAddress;
 
 import fr.valtech.coursDuSoir.mongodb.model.Clipart;
 
-@Ignore
 public class WriteAccessTest {
 
     @Before
@@ -37,7 +35,6 @@ public class WriteAccessTest {
     }
 
     @Test
-    @Ignore
     public void with_database_writetest_should_reattribute_clipart_to_Keistutis() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         mongoCourDuSoir.with_writetest_database_reattribute_clipart_entitled_PC_LAPTOP_NOTEBOOK();

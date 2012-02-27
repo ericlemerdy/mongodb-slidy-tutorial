@@ -18,7 +18,6 @@ import fr.valtech.coursDuSoir.mongodb.model.Uploader;
 public class MongoCoursDuSoirTest {
 
     @Test
-    @Ignore
     public void should_create_db() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         DB db = mongoCourDuSoir.connect_tip_use_Mongo_object();
@@ -26,7 +25,6 @@ public class MongoCoursDuSoirTest {
     }
 
     @Test
-    @Ignore
     public void should_create_Jongo() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         Jongo jongo = mongoCourDuSoir.create_tip_use_jongo_object();
@@ -34,7 +32,6 @@ public class MongoCoursDuSoirTest {
     }
 
     @Test
-    @Ignore
     public void should_get_cliparts_collection() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         MongoCollection cliparts = mongoCourDuSoir.get_cliparts_collection();
@@ -42,14 +39,12 @@ public class MongoCoursDuSoirTest {
     }
 
     @Test
-    @Ignore
     public void should_count_cliparts() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         assertThat(mongoCourDuSoir.count_cliparts()).isEqualTo(3);
     }
 
     @Test
-    @Ignore
     public void should_find_cliparts_entitled_CodeStoryLogo() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         Iterator<Clipart> cliparts_entitled_CodeStoryLogo = mongoCourDuSoir.find_cliparts_entitled_CodeStoryLogo()
@@ -60,7 +55,6 @@ public class MongoCoursDuSoirTest {
     }
 
     @Test
-    @Ignore
     public void should_find_Keistutis_uploader() throws UnknownHostException {
         MongoCourDuSoir mongoCourDuSoir = new MongoCourDuSoirImpl();
         Uploader keistutis = mongoCourDuSoir.find_Keistutis_uploader();
